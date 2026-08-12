@@ -1,0 +1,15 @@
+{
+  "name": "cipherdrop",
+  "version": "1.0.0",
+  "description": "Quantum-safe file sharing — ML-KEM-512 (NIST FIPS 203) + AES-256-GCM, client-side.",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/mlkem-entry.js --bundle --minify --format=iife --target=es2020 --outfile=static/js/mlkem.bundle.js"
+  },
+  "dependencies": {
+    "@noble/post-quantum": "^0.6.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
+  }
+}
