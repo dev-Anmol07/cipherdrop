@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+<meta name="referrer" content="no-referrer">
+<title>CipherDrop — Quantum-Safe File Sharing</title>
+<link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">◆</span>
+    <span class="brand-name">CipherDrop</span>
+  </div>
+  <div class="badge">ML-KEM-512 · NIST FIPS 203</div>
+</header>
+
+<main id="app">
+
+  <!-- ============ SEND VIEW ============ -->
+  <section id="send-view" class="view">
+    <h1>Quantum-safe file sharing.<br />Zero friction.</h1>
+    <p class="sub">Files, filenames, and file types are all encrypted in your browser before upload. The server only ever sees ciphertext.</p>
+
+    <div class="ttl-row">
+      <label for="ttl-select">Auto-delete if unopened after</label>
+      <select id="ttl-select">
+        <option value="300000">5 minutes</option>
+        <option value="900000" selected>15 minutes</option>
+        <option value="3600000">1 hour</option>
+        <option value="86400000">24 hours</option>
+      </select>
+    </div>
+
+    <div id="dropzone" class="dropzone">
+      <input type="file" id="file-input" hidden />
+      <div class="dropzone-inner">
+        <div class="dropzone-icon">⇪</div>
+        <div class="dropzone-text">Drop a file here, or <span class="link-text">browse</span></div>
+        <div class="dropzone-hint">Encrypted client-side · up to 100 MB · no account needed</div>
+      </div>
+    </div>
+
+    <div id="progress" class="progress hidden">
+      <div class="progress-step" data-step="keygen">Generating ML-KEM-512 keypair…</div>
+      <div class="progress-step" data-step="encaps">Encapsulating session key…</div>
+      <div class="progress-step" data-step="encrypt">Encrypting file with AES-256-GCM…</div>
+      <div class="progress-step" data-step="upload">Uploading ciphertext…</div>
+    </div>
+
+    <div id="result" class="result hidden">
+      <div class="result-label">Your one-time link</div>
+      <div class="link-row">
+        <input id="result-link" type="text" readonly />
+        <button id="copy-btn">Copy</button>
+      </div>
+      <div class="result-hint">This link works once. The decryption key never touches our server — it lives only in the link itself.</div>
+      <div id="expiry-note" class="expiry-note"></div>
+      <button id="reset-btn" class="secondary-btn">Share another file</button>
+    </div>
+
+    <div id="error" class="error hidden"></div>
+  </section>
+
+  <!-- ============ RECEIVE VIEW ============ -->
+  <section id="receive-view" class="view hidden">
+    <h1>Someone shared a file with you.</h1>
+    <p class="sub" id="receive-sub">Decrypting locally in your browser — the file, its name, and its type were never readable to any server.</p>
+
+    <div id="receive-progress" class="progress">
+      <div class="progress-step" data-step="fetch">Fetching ciphertext…</div>
+      <div class="progress-step" data-step="decaps">Decapsulating session key…</div>
+      <div class="progress-step" data-step="decrypt">Decrypting with AES-256-GCM…</div>
+    </div>
+
+    <div id="receive-result" class="result hidden">
+      <div class="result-label">Ready to download</div>
+      <div id="receive-filename" class="filename"></div>
+      <button id="download-btn" class="primary-btn">Download file</button>
+      <div class="result-hint">This link has now been permanently deleted from the server.</div>
+    </div>
+
+    <div id="receive-error" class="error hidden"></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <span>Client-side ML-KEM-512 + AES-256-GCM</span>
+  <span class="dot">·</span>
+  <span>Key never leaves your browser</span>
+</footer>
+
+<script src="/static/js/mlkem.bundle.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
