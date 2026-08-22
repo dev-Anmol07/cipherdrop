@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+<meta name="referrer" content="no-referrer">
+<title>CipherDrop — Quantum-Safe File Sharing</title>
+<link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+    </span>
+    <span class="brand-name">CipherDrop</span>
+  </div>
+
+  <nav class="main-nav" role="tablist" aria-label="Sections">
+    <button class="nav-tab active" data-tab="vault" role="tab" aria-selected="true">Secure Vault</button>
+    <button class="nav-tab" data-tab="activity" role="tab" aria-selected="false">Activity</button>
+    <button class="nav-tab" data-tab="keys" role="tab" aria-selected="false">Keys</button>
+  </nav>
+
+  <div class="nav-actions">
+    <button class="send-file-btn" id="nav-send-btn">Send File</button>
+
+    <div style="position:relative;">
+      <button class="icon-btn" id="profile-btn" aria-label="About CipherDrop" title="About">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+      </button>
+      <div class="icon-dropdown hidden" id="profile-dropdown">
+        <h3>About CipherDrop</h3>
+        <p>Quantum-safe, one-time file sharing. Built by Akshat Verma &amp; Anmol Singh for Grand Hack IPEC 2026. ML-KEM-512 (NIST FIPS 203) + AES-256-GCM, encrypted entirely client-side.</p>
+        <a href="https://github.com/dev-Anmol07/cipherdrop" target="_blank" rel="noopener noreferrer">View source on GitHub →</a>
+      </div>
+    </div>
+
+    <div style="position:relative;">
+      <button class="icon-btn" id="settings-btn" aria-label="Settings" title="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <div class="icon-dropdown hidden" id="settings-dropdown">
+        <h3>Settings</h3>
+        <label for="default-ttl-select">Default self-destruct timer</label>
+        <select id="default-ttl-select">
+          <option value="300000">5 minutes</option>
+          <option value="900000" selected>15 minutes</option>
+          <option value="3600000">1 hour</option>
+          <option value="86400000">24 hours</option>
+        </select>
+        <p style="margin-top:10px;">Applies to your next upload. Stored only in this tab's memory — nothing here is saved to an account, because there are none.</p>
+
+        <hr style="border:none; border-top:1px solid var(--line); margin:14px 0;" />
+
+        <h3>Vault Identity</h3>
+
+        <div id="identity-none">
+          <p>Create a permanent identity on this device to receive files with real quantum-safe protection (see Keys tab for why this matters).</p>
+          <label for="create-vault-id-input">Choose a Vault ID</label>
+          <input type="text" id="create-vault-id-input" placeholder="e.g. anmol-cipherdrop" style="width:100%; background:var(--panel-raised); border:1px solid var(--line); color:var(--paper); border-radius:8px; padding:8px 10px; font-size:13px; margin-bottom:10px;" />
+          <label for="create-vault-pass-input">Passphrase (optional, recommended)</label>
+          <input type="password" id="create-vault-pass-input" placeholder="Protects your key on this device" style="width:100%; background:var(--panel-raised); border:1px solid var(--line); color:var(--paper); border-radius:8px; padding:8px 10px; font-size:13px; margin-bottom:10px;" />
+          <button id="create-identity-btn" class="primary-btn" style="width:100%;">Create My Vault</button>
+        </div>
+
+        <div id="identity-exists" class="hidden">
+          <p>Your Vault ID on this device:</p>
+          <p style="font-family:var(--font-mono); font-size:14px; color:var(--accent); margin:-6px 0 6px;" id="identity-vault-id"></p>
+          <p style="font-size:11px; color:var(--fog); margin:0 0 4px;">Key fingerprint — share this so others can verify it's really you before sending here:</p>
+          <p style="font-family:var(--font-mono); font-size:12px; word-break:break-all; margin:0 0 6px;" id="identity-fingerprint"></p>
+          <p id="identity-protected-note" class="hidden" style="font-size:11.5px;">🔒 Private key is passphrase-protected.</p>
+          <button id="export-identity-btn" class="secondary-btn" style="width:100%; margin-top:8px;">Export identity (backup)</button>
+          <label class="secondary-btn" style="display:block; text-align:center; width:100%; margin-top:8px; cursor:pointer;">
+            Import a different identity
+            <input type="file" id="import-identity-input" accept="application/json" hidden />
+          </label>
+          <button id="forget-identity-btn" class="secondary-btn" style="width:100%; margin-top:8px; color:var(--danger); border-color:var(--danger);">Forget on this device</button>
+        </div>
+
+        <div id="identity-error" class="error hidden" style="margin-top:10px;"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="app">
+
+  <!-- ============ SECURE VAULT TAB ============ -->
+  <section id="tab-vault" class="tab-panel">
+    <div class="hero">
+      <h1>Quantum-Safe File Transfer</h1>
+      <p class="hero-sub">End-to-end encrypted sharing with post-quantum cryptography.</p>
+    </div>
+
+    <div class="vault-card">
+      <div class="mode-toggle" role="tablist" aria-label="Send or receive">
+        <button class="mode-pill active" id="mode-send-btn" data-mode="send" role="tab" aria-selected="true">Send</button>
+        <button class="mode-pill" id="mode-receive-btn" data-mode="receive" role="tab" aria-selected="false">Receive</button>
+      </div>
+
+      <!-- ---- SEND pane ---- -->
+      <div id="send-view" class="mode-pane">
+
+        <div class="send-mode-toggle" role="tablist" aria-label="Quick link or send to a vault">
+          <button class="send-mode-pill active" id="send-quick-btn" role="tab" aria-selected="true">Quick Link</button>
+          <button class="send-mode-pill" id="send-vault-btn" role="tab" aria-selected="false">To a Vault</button>
+        </div>
+
+        <div id="send-vault-id-row" class="paste-row hidden" style="margin-top:12px;">
+          <input type="text" id="send-vault-id-input" placeholder="Recipient's Vault ID" />
+        </div>
+        <div class="paste-hint hidden" id="send-vault-fingerprint" style="font-family:var(--font-mono); margin-top:-8px; margin-bottom:12px; word-break:break-all;"></div>
+        <div class="paste-hint" id="send-vault-hint" style="margin-top:-8px; margin-bottom:16px;">
+          Encrypts against the recipient's own long-term key instead of a one-time link — this is the mode that actually defends against a future quantum computer, since a real public key travels over the network. See the Keys tab for why.
+        </div>
+
+        <div class="timer-row" style="margin-top:0;">
+          <div class="timer-row-left">
+            <span class="timer-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>
+            </span>
+            <div>
+              <div class="timer-title">Self-destruct timer</div>
+              <div class="timer-sub">Deletes on first download, or automatically after this</div>
+            </div>
+          </div>
+          <select id="ttl-select">
+            <option value="300000">5 minutes</option>
+            <option value="900000" selected>15 minutes</option>
+            <option value="3600000">1 hour</option>
+            <option value="86400000">24 hours</option>
+          </select>
+        </div>
+
+        <div id="dropzone" class="dropzone" style="margin-top:16px;">
+          <input type="file" id="file-input" hidden />
+          <div class="dropzone-inner">
+            <div class="dropzone-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+            </div>
+            <div class="dropzone-text">Drag &amp; drop files here</div>
+            <div class="dropzone-hint" style="margin-top:4px;">or click to browse</div>
+            <div class="size-badge">Max 100 MB per transfer</div>
+          </div>
+        </div>
+
+        <div id="progress" class="progress hidden">
+          <div class="progress-step" data-step="keygen">Generating ML-KEM-512 keypair…</div>
+          <div class="progress-step" data-step="encaps">Encapsulating session key…</div>
+          <div class="progress-step" data-step="encrypt">Encrypting file with AES-256-GCM…</div>
+          <div class="progress-step" data-step="upload">Uploading ciphertext…</div>
+        </div>
+
+        <div id="result" class="result hidden">
+          <div class="result-label">Your one-time link</div>
+          <div class="link-row">
+            <input id="result-link" type="text" readonly />
+            <button id="copy-btn">Copy</button>
+          </div>
+          <div class="result-hint">This link works once. The decryption key never touches our server — it lives only in the link itself.</div>
+          <div id="expiry-note" class="expiry-note"></div>
+          <button id="reset-btn" class="secondary-btn">Share another file</button>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+      </div>
+
+      <!-- ---- RECEIVE pane ---- -->
+      <div id="receive-view" class="mode-pane hidden">
+        <div id="receive-paste-row" class="paste-row">
+          <input type="text" id="receive-link-input" placeholder="Paste your secure link here" />
+          <button id="receive-decrypt-btn" class="primary-btn">Decrypt &amp; Download</button>
+        </div>
+        <div class="paste-hint" id="receive-hint">Paste the full link someone sent you — the whole thing, including anything after "#" or "?vault=".</div>
+
+        <div id="receive-progress" class="progress hidden">
+          <div class="progress-step" data-step="fetch">Fetching ciphertext…</div>
+          <div class="progress-step" data-step="decaps">Decapsulating session key…</div>
+          <div class="progress-step" data-step="decrypt">Decrypting with AES-256-GCM…</div>
+        </div>
+
+        <div id="receive-result" class="result hidden">
+          <div class="result-label">Ready to download</div>
+          <div id="receive-filename" class="filename"></div>
+          <button id="download-btn" class="primary-btn">Download file</button>
+          <div class="result-hint">This link has now been permanently deleted from the server.</div>
+        </div>
+
+        <div id="receive-error" class="error hidden"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ACTIVITY TAB ============ -->
+  <section id="tab-activity" class="tab-panel hidden">
+    <div class="panel-card">
+      <h2>Activity</h2>
+      <p class="panel-sub">Files you've sent from this browser tab. This list lives only in your browser's memory — it's never uploaded anywhere, which is why a filename is visible here at all: only you can see it. It resets if you reload the page.</p>
+      <div id="activity-list" class="activity-list">
+        <div class="activity-empty">Nothing sent yet in this session.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ KEYS TAB ============ -->
+  <section id="tab-keys" class="tab-panel hidden">
+    <div class="panel-card">
+      <h2>Keys</h2>
+      <p class="panel-sub">CipherDrop has two sending modes that use ML-KEM-512 differently. Here's exactly what each one does.</p>
+
+      <div class="key-fact-grid">
+        <div class="key-fact">
+          <div class="key-fact-label">Quick Link — encapsulation key (ek)</div>
+          <div class="key-fact-value">800 bytes · generated fresh for every file · discarded immediately after use, never transmitted anywhere</div>
+        </div>
+        <div class="key-fact">
+          <div class="key-fact-label">Quick Link — decapsulation key (dk)</div>
+          <div class="key-fact-value">1632 bytes · lives only in the shared link's URL fragment (after the "#") · browsers never send this to any server</div>
+        </div>
+        <div class="key-fact">
+          <div class="key-fact-label">Vault — encapsulation key (ek)</div>
+          <div class="key-fact-value">800 bytes · generated once per device, published to this server's identity directory under your chosen Vault ID · genuinely public, meant to be seen</div>
+        </div>
+        <div class="key-fact">
+          <div class="key-fact-label">Vault — decapsulation key (dk)</div>
+          <div class="key-fact-value">1632 bytes · generated once, stored only on your device (optionally passphrase-protected) · never appears in any link, ever</div>
+        </div>
+        <div class="key-fact">
+          <div class="key-fact-label">Session key (either mode)</div>
+          <div class="key-fact-value">32 bytes · derived once via ML-KEM-512 encapsulation · used for that single file's AES-256-GCM encryption, then gone</div>
+        </div>
+      </div>
+
+      <p class="key-note"><strong style="color:var(--paper);">Quick Link doesn't defend against harvest-now-decrypt-later</strong> — the link itself is a bearer secret, so intercepting it works whether or not the attacker ever gets a quantum computer. <strong style="color:var(--paper);">Vault mode does</strong>: a real public key travels over real network traffic, and ML-KEM's underlying lattice problem has no known efficient quantum attack, unlike the RSA/ECDH math a classical "harvest now" attacker is actually betting on. Use Vault mode when this specific threat matters to you.</p>
+
+      <p class="key-note" style="margin-top:14px;"><strong style="color:var(--paper);">Registering a Vault ID doesn't cryptographically prove you own it</strong> — anyone can claim an unused name. Real proof-of-possession would require this server to run ML-KEM operations itself, which would break the "zero cryptographic code on the backend" property everything else here relies on, so that trade wasn't made. Instead, every Vault key has a <strong style="color:var(--paper);">fingerprint</strong> (shown in Settings, and shown to a sender before they encrypt) — the same out-of-band verification model Signal and PGP use. It won't stop a name being squatted, but it makes an impersonation attempt detectable instead of invisible.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <span>© 2026 CipherDrop · Quantum-Safe Systems · All rights reserved.</span>
+  <div class="footer-links">
+    <a href="#" id="footer-protocol-link">Encryption Protocol</a>
+    <a href="#" id="footer-terms-link">Terms of Service</a>
+    <a href="#" id="footer-status-link">API Status</a>
+  </div>
+</footer>
+
+<div class="toast" id="toast"><span class="toast-dot" id="toast-dot"></span><span id="toast-text"></span></div>
+
+<!-- Terms modal (simple, honest, not styled as a legal document) -->
+<div class="icon-dropdown hidden" id="terms-panel" style="position:fixed; bottom:70px; left:50%; transform:translateX(-50%); width:320px;">
+  <h3>Terms of Service</h3>
+  <p>This is a hackathon project (Grand Hack IPEC 2026), not a commercial product. No warranty, no uptime guarantee, no support commitment. Files are encrypted client-side and this server never sees plaintext — see the Keys tab for exactly what it does and doesn't protect against.</p>
+  <button class="secondary-btn" id="terms-close-btn" style="margin-top:4px; width:100%;">Close</button>
+</div>
+
+<script src="/static/js/mlkem.bundle.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
