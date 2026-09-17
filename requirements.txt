@@ -1,4 +1,0 @@
-Flask==3.0.3
-flask-cors==4.0.1
-flask-limiter==3.8.0
-gunicorn==22.0.0
